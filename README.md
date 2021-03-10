@@ -23,7 +23,7 @@ DICE represents a social welfare function which increases with population and pe
 
 The model seeks to optimize the flow of consumption over time by setting economic and climate policies. Consumption is general. The aim is to maximise a social welfare function $W$. This is the discounted sum of the population-weighted utility of per capita consumption. $c$ is the per-capita consumption. $l(t)$ is the population as well as labour. $R(t)$ is the discount factor. Hence we have
 
-$W = \sum_{t=1}^T U[c(t), L(t)] R(t) $
+$$W = \sum_{t=1}^T U[c(t), L(t)] R(t)$$.
 
 The function $U$ captures the utility of consumption. The following function is assumed
 
