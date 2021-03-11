@@ -15,17 +15,18 @@ from dice_dynamics import objFn, simulateDynamics, plotStateToFile, dumpState
 ###############################################################################
 
 if __name__ == '__main__':
-   
 
     num_times = 100
-    t = np.arange(1, num_times+1)
+    tstep = 5.0
 
-    start_year = 2000
-    final_year = 2500
-    years = np.linspace(start_year, final_year, num_times, dtype = np.int32)
+    t = np.arange(1, num_times+1)
     
-    p = DiceParams(num_times)
+    p = DiceParams(num_times, tstep)
     outputType = 1
+
+    start_year = 2015
+    final_year = start_year + p._tstep * num_times
+    years = np.linspace(start_year, final_year, num_times, dtype = np.int32)
 
     argsv = [-1.0, outputType, num_times,
              p._tstep, 
@@ -106,8 +107,17 @@ if __name__ == '__main__':
 
     start = time.time()
     
-    results = opt.minimize(objFn, x_start, args, method=methodStr, tol = 1e-10, bounds = tuple(bnds), options={'disp': True})
+    results = opt.minimize(objFn, x_start, args, method=methodStr, 
+                           options = {'ftol':1e-16, 'eps':1e-7, 'disp': True}, 
+                           bounds = tuple(bnds))
 
+    x_start = results.x
+
+    # This removes some of the oscillations in the Saving Rates.
+    methodStr = 'POWELL'
+    results = opt.minimize(objFn, x_start, args, method=methodStr, tol =1e-16,
+                           options = {'disp': True}, bounds = tuple(bnds))
+    
     end = time.time()
     print("Time Elapsed:", end - start)
 

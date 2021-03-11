@@ -12,12 +12,12 @@ class DiceParams():
 
     """ This class holds the static (over a run) inputs to the DICE model. """
 
-    def __init__(self, num_times):
+    def __init__(self, num_times, tstep):
 
         # Maximum cumulative extraction fossil fuels (GtC); denoted by CCum
         self._fosslim = 6000.0 
         # Years per Period
-        self._tstep = 5.0
+        self._tstep = tstep
         # Indicator where optimized is 1 and base is 0
         self._ifopt = 0.0
 

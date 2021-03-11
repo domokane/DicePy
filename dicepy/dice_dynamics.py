@@ -94,6 +94,7 @@ def simulateDynamics(x, sign, outputType, num_times,
     CPRICE = np.zeros(num_times+1)
     CEMUTOTPER = np.zeros(num_times+1)
 
+
     # Fixed initial values        
     MAT[1] = mat0
     ML[1] = ml0
@@ -149,8 +150,10 @@ def simulateDynamics(x, sign, outputType, num_times,
         ABATECOST[i] = YGROSS[i] * cost1[i] * MIUopt[i]**expcost2
         MCABATE[i] = pbacktime[i] * MIUopt[i]**(expcost2-1)
         CPRICE[i] = pbacktime[i] * (MIUopt[i])**(expcost2-1)
+
         YNET[i] = YGROSS[i] * (1.0 - DAMFRAC[i])
         Y[i] = YNET[i] - ABATECOST[i]
+
         I[i] = Sopt[i] * Y[i] 
         C[i] = Y[i] - I[i]
         CPC[i] = MILLE * C[i] / L[i]
@@ -162,7 +165,7 @@ def simulateDynamics(x, sign, outputType, num_times,
 
     RI[-1] = 0.0
 
-    output = np.zeros((num_times, 27))
+    output = np.zeros((num_times, 50))
 
     if outputType == 0: 
 
@@ -173,37 +176,53 @@ def simulateDynamics(x, sign, outputType, num_times,
         
     elif outputType == 1:
 
+        # EXTRA VALUES COMPUTED LATER
+        CO2PPM = np.zeros(num_times+1)
+        for i in range(1, num_times):
+            CO2PPM[i] = MAT[i] / 2.13
+
+        SOCCC = np.zeros(num_times+1)
+        for i in range(1, num_times):
+            SOCCC[i] = -999.0
+
         for iTime in range(1, num_times+1):
 
             col = 0
             jTime = iTime - 1
-            output[jTime, col] = K[iTime]; col += 1 # 0
-            output[jTime, col] = YGROSS[iTime]; col += 1 # 1
-            output[jTime, col] = EIND[iTime]; col += 1 # 2
-            output[jTime, col] = E[iTime]; col += 1 # 3
-            output[jTime, col] = CCA[iTime]; col += 1 # 4
-            output[jTime, col] = CCATOT[iTime]; col += 1 # 5
-            output[jTime, col] = MAT[iTime]; col += 1 # 6
-            output[jTime, col] = ML[iTime]; col += 1 # 7
-            output[jTime, col] = MU[iTime]; col += 1 # 8
-            output[jTime, col] = FORC[iTime]; col += 1 # 9
-            output[jTime, col] = TATM[iTime]; col += 1 # 10
-            output[jTime, col] = TOCEAN[iTime]; col += 1 # 11
-            output[jTime, col] = DAMFRAC[iTime]; col += 1 # 12
-            output[jTime, col] = DAMAGES[iTime]; col += 1 # 13
-            output[jTime, col] = ABATECOST[iTime]; col += 1 # 14
-            output[jTime, col] = MCABATE[iTime]; col += 1 # 15
-            output[jTime, col] = CPRICE[iTime]; col += 1 # 16
+            output[jTime, col] = EIND[iTime]; col += 1 # 0
+            output[jTime, col] = E[iTime]; col += 1 # 1
+            output[jTime, col] = CO2PPM[iTime]; col += 1 # 2
+            output[jTime, col] = TATM[iTime]; col += 1 # 3
+            output[jTime, col] = Y[iTime]; col += 1 # 4
+            output[jTime, col] = DAMFRAC[iTime]; col += 1 # 5
+            output[jTime, col] = CPC[iTime]; col += 1 # 6
+            output[jTime, col] = CPRICE[iTime]; col += 1 # 7
+            output[jTime, col] = MIUopt[iTime]; col += 1 # 8
+            output[jTime, col] = RI[iTime]; col += 1 # 9
+            output[jTime, col] = SOCCC[iTime]; col += 1 # 10
+
+            output[jTime, col] = l[iTime]; col += 1 # 11
+            output[jTime, col] = al[iTime]; col += 1 # 12
+            output[jTime, col] = YGROSS[iTime]; col += 1 # 13
+
+            output[jTime, col] = K[iTime]; col += 1 # 14
+            output[jTime, col] = Sopt[iTime]; col += 1 # 15
+            output[jTime, col] = I[iTime]; col += 1 # 16
             output[jTime, col] = YNET[iTime]; col += 1 # 17
-            output[jTime, col] = Y[iTime]; col += 1 # 18
-            output[jTime, col] = I[iTime]; col += 1 # 19
-            output[jTime, col] = C[iTime]; col += 1 # 20
-            output[jTime, col] = CPC[iTime]; col += 1 # 21
-            output[jTime, col] = RI[iTime]; col += 1 # 22
-            output[jTime, col] = PERIODU[iTime]; col += 1 # 23
-            output[jTime, col] = CEMUTOTPER[iTime]; col += 1 # 24
-            output[jTime, col] = Sopt[iTime]; col += 1 # 25
-            output[jTime, col] = MIUopt[iTime];
+
+            output[jTime, col] = CCA[iTime]; col += 1 # 18
+            output[jTime, col] = CCATOT[iTime]; col += 1 # 19
+            output[jTime, col] = ML[iTime]; col += 1 # 20
+            output[jTime, col] = MU[iTime]; col += 1 # 21
+            output[jTime, col] = FORC[iTime]; col += 1 # 22
+            output[jTime, col] = TOCEAN[iTime]; col += 1 # 23
+            output[jTime, col] = DAMAGES[iTime]; col += 1 # 24
+            output[jTime, col] = ABATECOST[iTime]; col += 1 # 25
+            output[jTime, col] = MCABATE[iTime]; col += 1 # 26
+            output[jTime, col] = C[iTime]; col += 1 # 27
+            output[jTime, col] = PERIODU[iTime]; col += 1 # 28
+            output[jTime, col] = CEMUTOTPER[iTime]; col += 1 # 29
+            output[jTime, col] = MAT[iTime]; col += 1 # 30
 
         return output
     
@@ -220,43 +239,53 @@ def dumpState(years, output, filename):
      writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
      header = []
-     header.append("IPERIOD")
-     header.append("K")
-     header.append("YGROSS")
      header.append("EIND")
      header.append("E")
+     header.append("CO2PPM")
+     header.append("TATM")
+     header.append("Y")
+     header.append("DAMFRAC")
+     header.append("CPC")
+     header.append("CPRICE")
+     header.append("MIUopt")
+     header.append("RI")
+     header.append("SOCCC")
+
+     header.append("L")
+     header.append("AL")
+     header.append("YGROSS")
+
+     header.append("K")
+     header.append("Sopt")
+     header.append("I")
+     header.append("YNET")
+
      header.append("CCA")
      header.append("CCATOT")
-     header.append("MAT")
      header.append("ML")
      header.append("MU")
      header.append("FORC")
-     header.append("TATM")
      header.append("TOCEAN")
-     header.append("DAMFRAC")
      header.append("DAMAGES")
      header.append("ABATECOST")
      header.append("MCABATE")
-     header.append("CPRICE")
-     header.append("YNET")
-     header.append("Y")
-     header.append("I")
      header.append("C")
-     header.append("CPC")
-     header.append("RI")
      header.append("PERIODU")
      header.append("CEMUTOTPER")
-     header.append("Sopt")
-     header.append("MIUopt")
-     writer.writerow(header)
+     header.append("MAT")
      
-     num_rows = output.shape[0]
-     num_cols = len(header)
+     num_cols = output.shape[0]
+     num_rows = len(header)
+     
+     row = ["INDEX"]
+     for iCol in range(0, num_cols):
+         row.append(iCol+1)
+     writer.writerow(row)
 
-     for iTime in range(0, num_rows):
-         row = [iTime]
-         for iCol in range(0, num_cols-1):
-            row.append(output[iTime, iCol])
+     for iRow in range(1, num_rows):
+         row = [header[iRow-1]]
+         for iCol in range(0, num_cols):
+            row.append(output[iCol, iRow-1])
          writer.writerow(row)
 
      f.close()
@@ -283,112 +312,112 @@ def plotStateToFile(fileName, years, output, x):
 
     pp = PdfPages(fileName)
 
-    TATM = output[10]
+    TATM = output[3]
     title = 'Change in Atmosphere Temperature (TATM)'
     xlabel = 'Years'
     ylabel = 'Degrees C from 1900'
     fig = plotFigure(years, TATM, xlabel, ylabel, title)
     pp.savefig(fig)
 
-    TOCEAN = output[11]
+    TOCEAN = output[23]
     xlabel = 'Years'
     title='Change in Ocean Temperature (TOCEAN)'
     ylabel= 'Degrees C from 1900'
     fig = plotFigure(years, TOCEAN, xlabel, ylabel, title)
     pp.savefig(fig)
 
-    MU = output[8]    
+    MU = output[21]    
     xlabel = 'Years'
     title='Change in Carbon Concentration Increase in Upper Oceans (MU)'
     ylabel = 'GtC from 1750'
     fig = plotFigure(years, MU, xlabel, ylabel, title)
     pp.savefig(fig)
 
-    ML = output[7]       
+    ML = output[20]       
     xlabel = 'Years'
     title='Change in Carbon Concentration in Lower Oceans (ML)'
     ylabel = 'GtC from 1750'
     fig = plotFigure(years, ML, xlabel, ylabel, title)
     pp.savefig(fig)
 
-    DAMAGES = output[13]
+    DAMAGES = output[24]
     xlabel = 'Years'
     title='Damages (DAMAGES)'
     ylabel = 'USD (2010) Trillions per Year'
     fig = plotFigure(years, DAMAGES, xlabel, ylabel, title)
     pp.savefig(fig)
 
-    DAMFRAC = output[12]    
+    DAMFRAC = output[5]    
     xlabel = 'Years'
     title='Damages as a Fraction of Gross Output (DAMFRAC)'
     ylabel = 'Damages Output Ratio'
     fig = plotFigure(years, DAMFRAC, xlabel, ylabel, title)
     pp.savefig(fig)
 
-    ABATECOST = output[14]    
+    ABATECOST = output[25]    
     xlabel = 'Years'
     title='Cost of Emissions Reductions (ABATECOST)'
     ylabel = 'USD (2010) Trillions per Year'
     fig = plotFigure(years, ABATECOST, xlabel, ylabel, title)
     pp.savefig(fig)
     
-    MCABATE = output[15]
+    MCABATE = output[26]
     xlabel = 'Years'
     title='Marginal abatement cost(MCABATE)'
     ylabel = '2010 USD per Ton of CO2'
     fig = plotFigure(years, MCABATE, xlabel, ylabel, title)
     pp.savefig(fig)
         
-    E = output[3]
+    E = output[1]
     xlabel = 'Years'
     title='Total CO2 emission (E)'
     ylabel = 'GtCO2 per year'
     fig = plotFigure(years, E, xlabel, ylabel, title)
     pp.savefig(fig)
 
-    MAT = output[6]
+    MAT = output[30]
     xlabel = 'Years'
     title='Change in Carbon Concentration in Atmosphere (MAT)'
     ylabel = 'GtC from 1750'
     fig = plotFigure(years, MAT, xlabel, ylabel, title)
     pp.savefig(fig)
     
-    FORC = output[9]
+    FORC = output[22]
     xlabel = 'Years'
     title='Increase in Radiative Forcing (FORC)'
     ylabel = 'Watts per M2 from 1900'
     fig = plotFigure(years, FORC, xlabel, ylabel, title)
     pp.savefig(fig)
     
-    RI = output[22]
+    RI = output[9]
     xlabel = 'Years'
     title='Real Interest Rate (RI)'
     ylabel = 'Rate per annum'
     fig = plotFigure(years, RI, xlabel, ylabel, title)
     pp.savefig(fig)
 
-    C = output[20]    
+    C = output[27]    
     xlabel = 'Years'
     title='Consumption (C)'
     ylabel = 'USD (2010) Trillion per Year'
     fig = plotFigure(years, C, xlabel, ylabel, title)
     pp.savefig(fig)
     
-    Y = output[18]
+    Y = output[4]
     xlabel = 'Years'
     title='Gross Product Net of Abatement and Damages (Y)'
     ylabel = 'USD (2010) Trillion per Year'
     fig = plotFigure(years, Y, xlabel, ylabel, title)
     pp.savefig(fig)
     
-    YGROSS = output[1]
+    YGROSS = output[13]
     xlabel = 'Years'
     title='World Gross Product (YGROSS)'
     ylabel = 'USD (2010) Trillion per Year'
     fig = plotFigure(years, YGROSS, xlabel, ylabel, title)
     pp.savefig(fig)
            
-    I = output[19]
+    I = output[16]
     xlabel = 'Years'
     title='Investment (I)'
     ylabel = 'USD (2010) Trillion per Year'
