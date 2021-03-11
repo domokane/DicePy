@@ -25,49 +25,13 @@ if __name__ == '__main__':
     years = np.linspace(start_year, final_year, num_times, dtype = np.int32)
     
     p = DiceParams(num_times)
-    
-    # * Control rate limits
-    MIU_up = np.full(num_times, p._limmiu)
-    MIU_up[0] = p._miu0
-    MIU_up[1:29] = 1.0
-
-    MIU_lo = np.full(num_times,0.01)
-    MIU_lo[0] = p._miu0
-    MIU_lo[MIU_lo==MIU_up] = 0.99999*MIU_lo[MIU_lo==MIU_up]
-
-    bnds1=[]
-    for i in range(num_times):
-        bnds1.append((MIU_lo[i],MIU_up[i]))
-    # * Control variables
-    lag10 = t > num_times - 10
-    S_lo = np.full(num_times,1e-1)
-    S_lo[lag10] = p._optlrsav
-    S_up = np.full(num_times,0.9)
-    S_up[lag10] = p._optlrsav
-    S_lo[S_lo==S_up] = 0.99999*S_lo[S_lo==S_up]
-
-    bnds2=[]
-    for i in range(num_times):
-        bnds2.append((S_lo[i],S_up[i]))
-        
-    # Arbitrary starting values for the control variables:
-    S_start = np.full(num_times,0.2)
-    S_start[S_start < S_lo] = S_lo[S_start < S_lo]
-    S_start[S_start > S_up] = S_lo[S_start > S_up]
-    MIU_start = 0.99 * MIU_up
-    MIU_start[MIU_start < MIU_lo] = MIU_lo[MIU_start < MIU_lo]
-    MIU_start[MIU_start > MIU_up] = MIU_up[MIU_start > MIU_up]
-
-    x_start = np.concatenate([MIU_start,S_start])
-    bnds = bnds1 + bnds2
-
     outputType = 1
 
-    argsv = [-1.0, outputType, num_times, 
+    argsv = [-1.0, outputType, num_times,
              p._tstep, 
              p._al, p._l, p._sigma, p._cumetree, p._forcoth, 
              p._cost1, p._etree, p._scale1, p._scale2, 
-             p._ml0, p._mu0, p._mat0, 
+             p._ml0, p._mu0, p._mat0, p._cca0,
              p._a1, p._a2, p._a3, 
              p._c1, p._c3, p._c4,
              p._b11, p._b12, p._b21, p._b22, p._b32, p._b23, p._b33, 
@@ -78,9 +42,62 @@ if __name__ == '__main__':
          
     args = tuple(argsv)
 
-    output = simulateDynamics(x_start, *args)        
+    # Arbitrary starting values for the control variables:
+    S_start = np.full(num_times,0.2596)
+    MIU_start = np.full(num_times,  0.03)
+    x_start = np.concatenate([MIU_start,S_start])
+
+    output = simulateDynamics(x_start, *args)
 
     dumpState(years, output, "./results/base_case_state_pre_opt.csv")
+
+    ###########################################################################
+    # OPTIMISATION
+    ###########################################################################
+    # BOUNDS 
+    
+    # * Control emissions rate limits upper limits    
+    MIU_up = np.full(num_times, p._limmiu)
+    MIU_up[0] = p._miu0 # The first value is not optimised but held fixed
+    MIU_up[1:29] = 1.0
+
+    # * Control emissions rate limits lower limits    
+    MIU_lo = np.full(num_times,0.01)
+    MIU_lo[0] = p._miu0
+    MIU_lo[MIU_lo==MIU_up] = 0.99999*MIU_lo[MIU_lo==MIU_up]
+
+    bnds1=[]
+    for i in range(num_times):
+        bnds1.append((MIU_lo[i],MIU_up[i]))
+
+    # Lower and upper limits on the savings rates
+    lag10 = t > num_times - 10
+    S_lo = np.full(num_times,1e-1)
+    S_lo[lag10] = p._optlrsav
+
+    S_up = np.full(num_times,0.9)
+    S_up[lag10] = p._optlrsav
+
+    S_lo[S_lo==S_up] = 0.99999*S_lo[S_lo==S_up]
+
+    bnds2=[]
+    for i in range(num_times):
+        bnds2.append((S_lo[i],S_up[i]))
+
+    ########################################################################### 
+       
+    # Arbitrary starting values for the control variables:
+    S_start = np.full(num_times,0.2)
+    S_start[S_start < S_lo] = S_lo[S_start < S_lo]
+    S_start[S_start > S_up] = S_lo[S_start > S_up]
+    MIU_start = 0.99 * MIU_up
+    MIU_start[MIU_start < MIU_lo] = MIU_lo[MIU_start < MIU_lo]
+    MIU_start[MIU_start > MIU_up] = MIU_up[MIU_start > MIU_up]
+
+    ###########################################################################
+    
+    x_start = np.concatenate([MIU_start,S_start])
+    bnds = bnds1 + bnds2
 
     outputType = 0
     argsv[1] = outputType

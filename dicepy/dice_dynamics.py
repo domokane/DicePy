@@ -39,7 +39,7 @@ def simulateDynamics(x, sign, outputType, num_times,
                      tstep, al, l, sigma, cumetree, forcoth,
                      cost1, etree, 
                      scale1, scale2, 
-                     ml0, mu0, mat0, 
+                     ml0, mu0, mat0, cca0,
                      a1, a2, a3, 
                      c1, c3, c4,
                      b11, b12, b21, b22, b32, b23, b33, 
@@ -101,11 +101,11 @@ def simulateDynamics(x, sign, outputType, num_times,
     TATM[1] = tatm0
     TOCEAN[1] = tocean0
     K[1] = k0
-
+    
     YGROSS[1] = al[1] * ((L[1]/MILLE)**(1.0-gama)) * K[1]**gama
     EIND[1] = sigma[1] * YGROSS[1] * (1.0 - MIUopt[1])
     E[1] = EIND[1] + etree[1]
-    CCA[1] = 0.0 # DOES NOT START TILL PERIOD 2
+    CCA[1] = cca0 # DOES NOT START TILL PERIOD 2
     CCATOT[1] = CCA[1] + cumetree[1]
     FORC[1] = fco22x * np.log(MAT[1]/588.000)/LOG2 + forcoth[1]
     DAMFRAC[1] = a1*TATM[1] + a2*TATM[1]**a3
@@ -162,7 +162,7 @@ def simulateDynamics(x, sign, outputType, num_times,
 
     RI[-1] = 0.0
 
-    output = np.zeros((num_times, 25))
+    output = np.zeros((num_times, 27))
 
     if outputType == 0: 
 
@@ -202,6 +202,8 @@ def simulateDynamics(x, sign, outputType, num_times,
             output[jTime, col] = RI[iTime]; col += 1 # 22
             output[jTime, col] = PERIODU[iTime]; col += 1 # 23
             output[jTime, col] = CEMUTOTPER[iTime]; col += 1 # 24
+            output[jTime, col] = Sopt[iTime]; col += 1 # 25
+            output[jTime, col] = MIUopt[iTime];
 
         return output
     
@@ -244,12 +246,14 @@ def dumpState(years, output, filename):
      header.append("RI")
      header.append("PERIODU")
      header.append("CEMUTOTPER")
+     header.append("Sopt")
+     header.append("MIUopt")
      writer.writerow(header)
      
      num_rows = output.shape[0]
      num_cols = len(header)
 
-     for iTime in range(1, num_rows):
+     for iTime in range(0, num_rows):
          row = [iTime]
          for iCol in range(0, num_cols-1):
             row.append(output[iTime, iCol])
@@ -267,7 +271,7 @@ def plotFigure(x, y, xlabel, ylabel, title):
     plt.title(title, fontsize=14)
     plt.xlabel(xlabel, fontsize=12)
     plt.ylabel(ylabel, fontsize=12)
-    fig.tight_layout()
+#    fig.tight_layout()
     return fig
     
 ###############################################################################
@@ -280,7 +284,7 @@ def plotStateToFile(fileName, years, output, x):
     pp = PdfPages(fileName)
 
     TATM = output[10]
-    title = 'Increase temperature of the atmosphere (TATM)'
+    title = 'Change in Atmosphere Temperature (TATM)'
     xlabel = 'Years'
     ylabel = 'Degrees C from 1900'
     fig = plotFigure(years, TATM, xlabel, ylabel, title)
@@ -288,21 +292,21 @@ def plotStateToFile(fileName, years, output, x):
 
     TOCEAN = output[11]
     xlabel = 'Years'
-    title='Increase temperature of the ocean (TOCEAN)'
+    title='Change in Ocean Temperature (TOCEAN)'
     ylabel= 'Degrees C from 1900'
     fig = plotFigure(years, TOCEAN, xlabel, ylabel, title)
     pp.savefig(fig)
 
     MU = output[8]    
     xlabel = 'Years'
-    title='Carbon concentration increase in shallow oceans (MU)'
+    title='Change in Carbon Concentration Increase in Upper Oceans (MU)'
     ylabel = 'GtC from 1750'
     fig = plotFigure(years, MU, xlabel, ylabel, title)
     pp.savefig(fig)
 
     ML = output[7]       
     xlabel = 'Years'
-    title='Carbon concentration increase in lower oceans (ML)'
+    title='Change in Carbon Concentration in Lower Oceans (ML)'
     ylabel = 'GtC from 1750'
     fig = plotFigure(years, ML, xlabel, ylabel, title)
     pp.savefig(fig)
@@ -310,28 +314,28 @@ def plotStateToFile(fileName, years, output, x):
     DAMAGES = output[13]
     xlabel = 'Years'
     title='Damages (DAMAGES)'
-    ylabel = 'trillions 2010 USD per year'
+    ylabel = 'USD (2010) Trillions per Year'
     fig = plotFigure(years, DAMAGES, xlabel, ylabel, title)
     pp.savefig(fig)
 
     DAMFRAC = output[12]    
     xlabel = 'Years'
-    title='Damages as fraction of gross output (DAMFRAC)'
-    ylabel = ''
+    title='Damages as a Fraction of Gross Output (DAMFRAC)'
+    ylabel = 'Damages Output Ratio'
     fig = plotFigure(years, DAMFRAC, xlabel, ylabel, title)
     pp.savefig(fig)
 
     ABATECOST = output[14]    
     xlabel = 'Years'
-    title='Cost of emissions reductions (ABATECOST)'
-    ylabel = 'trillions 2010 USD per year'
+    title='Cost of Emissions Reductions (ABATECOST)'
+    ylabel = 'USD (2010) Trillions per Year'
     fig = plotFigure(years, ABATECOST, xlabel, ylabel, title)
     pp.savefig(fig)
     
     MCABATE = output[15]
     xlabel = 'Years'
     title='Marginal abatement cost(MCABATE)'
-    ylabel = '2010 USD per ton CO2'
+    ylabel = '2010 USD per Ton of CO2'
     fig = plotFigure(years, MCABATE, xlabel, ylabel, title)
     pp.savefig(fig)
         
@@ -344,21 +348,21 @@ def plotStateToFile(fileName, years, output, x):
 
     MAT = output[6]
     xlabel = 'Years'
-    title='Carbon concentration increase in the atmosphere (MAT)'
+    title='Change in Carbon Concentration in Atmosphere (MAT)'
     ylabel = 'GtC from 1750'
     fig = plotFigure(years, MAT, xlabel, ylabel, title)
     pp.savefig(fig)
     
     FORC = output[9]
     xlabel = 'Years'
-    title='Increase in radiative forcing (FORC)'
-    ylabel = 'watts per m2 from 1900'
+    title='Increase in Radiative Forcing (FORC)'
+    ylabel = 'Watts per M2 from 1900'
     fig = plotFigure(years, FORC, xlabel, ylabel, title)
     pp.savefig(fig)
     
     RI = output[22]
     xlabel = 'Years'
-    title='Real interest rate (RI)'
+    title='Real Interest Rate (RI)'
     ylabel = 'Rate per annum'
     fig = plotFigure(years, RI, xlabel, ylabel, title)
     pp.savefig(fig)
@@ -366,28 +370,28 @@ def plotStateToFile(fileName, years, output, x):
     C = output[20]    
     xlabel = 'Years'
     title='Consumption (C)'
-    ylabel = 'trillions 2010 USD per year'
+    ylabel = 'USD (2010) Trillion per Year'
     fig = plotFigure(years, C, xlabel, ylabel, title)
     pp.savefig(fig)
     
     Y = output[18]
     xlabel = 'Years'
-    title='Gross product net of abatement and damages (Y)'
-    ylabel = 'trillions 2010 USD per year'
+    title='Gross Product Net of Abatement and Damages (Y)'
+    ylabel = 'USD (2010) Trillion per Year'
     fig = plotFigure(years, Y, xlabel, ylabel, title)
     pp.savefig(fig)
     
     YGROSS = output[1]
     xlabel = 'Years'
-    title='World gross product (YGROSS)'
-    ylabel = 'trillions 2010 USD per year'
+    title='World Gross Product (YGROSS)'
+    ylabel = 'USD (2010) Trillion per Year'
     fig = plotFigure(years, YGROSS, xlabel, ylabel, title)
     pp.savefig(fig)
            
     I = output[19]
     xlabel = 'Years'
     title='Investment (I)'
-    ylabel = 'Trillions 2010 USD per year'
+    ylabel = 'USD (2010) Trillion per Year'
     fig = plotFigure(years, I, xlabel, ylabel, title)
     pp.savefig(fig)
 
@@ -395,13 +399,13 @@ def plotStateToFile(fileName, years, output, x):
 
     S = x[num_times:(2*num_times)]
     xlabel = 'Years'
-    title='Optimised: Saving rate  (S)'
+    title='Optimised: Saving Rates (S)'
     ylabel = 'Rate'
     fig = plotFigure(years, S, xlabel, ylabel, title)
     pp.savefig(fig)
 
     MIU = x[0:num_times]
-    title='Optimised: Carbon emission control rate (MIU)'
+    title='Optimised: Carbon Emission Control Rate (MIU)'
     xlabel = 'Years'
     ylabel = 'Rate'
     fig = plotFigure(years, MIU, xlabel, ylabel, title)

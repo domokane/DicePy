@@ -6,6 +6,7 @@ Created on Wed Mar  3 21:06:52 2021
 """
 
 import numpy as np
+import csv
 
 class DiceParams():
 
@@ -54,7 +55,8 @@ class DiceParams():
         self._deland = 0.115 # Decline rate of land emissions (per period)
         self._e0 = 35.85 # Industrial emissions 2015 (GtCO2 per year)
         self._miu0 = 0.03 # Initial emissions control rate for base case 2015
-        self._cumetree0 = 100.0 # I ADDED THIS agrees with RR
+        self._cumetree0 = 100.0 # I ADDED THIS agrees with Nordhaus GAMS code
+        self._cca0 = 400.0 # This is an initial condition in Nordhaus GAMS code
 
         #######################################################################
         # Carbon Cycle Initial Conditions
@@ -186,8 +188,49 @@ class DiceParams():
         #Optimal long-run savings rate used for transversality (Question)        
         self._optlrsav = (self._dk + .004)/(self._dk + .004 * self._elasmu + self._prstp) * self._gama 
 
-        if 1==0:
+        if 1==1:
+
+            f = open("./results/parameters.csv" , mode = "w", newline='')
+            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        
+            header = []
+            header.append("PERIOD")
+            header.append("L")
+            header.append("GA")
+            header.append("AL")
+            header.append("GSIG")
+            header.append("SIGMA")
+            header.append("PBACKTIME")
+            header.append("COST1")
+            header.append("ETREE")
+            header.append("CUMETREE")
+            header.append("RR")
+            header.append("CPRICEBASE")
+            writer.writerow(header)
             
+            num_rows = self._num_times + 1
+        
+            for i in range(0, num_rows):
+                row = []
+                row.append(i)
+                row.append(self._l[i])
+                row.append(self._ga[i])
+                row.append(self._al[i])
+                row.append(self._gsig[i])
+                row.append(self._sigma[i])
+                row.append(self._pbacktime[i])
+                row.append(self._cost1[i])
+                row.append(self._etree[i])
+                row.append(self._cumetree[i])
+                row.append(self._rr[i])
+                row.append(self._cpricebase[i])
+                   
+                writer.writerow(row)
+
+            f.close()
+
+        elif 1==2:        
+
             print("Labour:", self._l) # CHECKED OK
             print("Growth rate of productivity", self._ga) # CHECKED OK
             print("Productivity", self._al) # CHECKED OK
