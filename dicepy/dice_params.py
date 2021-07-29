@@ -19,7 +19,7 @@ class DiceParams():
         # Years per Period
         self._tstep = tstep
         # Indicator where optimized is 1 and base is 0
-        self._ifopt = 0.0
+        self._ifopt = 0
 
         #######################################################################
         # Economic Preferences
@@ -36,10 +36,10 @@ class DiceParams():
 
         self._gama = 0.300 # Capital elasticity in production function
         self._pop0 = 7403.0 # Initial world population 2015 (millions)
-        self._popadj = 0.134 # Growth rate to calibrate to 2050 pop projection
+        self._popadj = 0.1340 # Growth rate to calibrate to 2050 pop projection
         self._popasym = 11500.0 # Asymptotic population (millions)
         self._dk = 0.100 # Depreciation rate on capital (per year)
-        self._q0 = 105.5 # Initial world gross output 2015 (trill 2010 USD)
+        self._q0 = 105.50 # Initial world gross output 2015 (trill 2010 USD)
         self._k0 = 223.0 # Initial capital value 2015 (trill 2010 USD)
         self._a0 = 5.115 # Initial level of total factor productivity
         self._ga0 = 0.076 # Initial growth rate for TFP per 5 years
@@ -49,9 +49,9 @@ class DiceParams():
         # Emissions parameters
         #######################################################################
 
-        self._gsigma1 = -0.0152 # Initial growth of sigma (per year)
-        self._dsig = -0.001 # Decline rate of decarbonization (per period)
-        self._eland0 = 2.6 # Carbon emissions from land 2015 (GtCO2 per year)
+        self._gsigma1 = -0.0152  # Initial growth of sigma (per year)
+        self._dsig = -0.001  # Decline rate of decarbonization (per period)
+        self._eland0 = 2.6  # Carbon emissions from land 2015 (GtCO2 per year)
         self._deland = 0.115 # Decline rate of land emissions (per period)
         self._e0 = 35.85 # Industrial emissions 2015 (GtCO2 per year)
         self._miu0 = 0.03 # Initial emissions control rate for base case 2015
@@ -73,50 +73,50 @@ class DiceParams():
         # Flow parameters, denoted by Phi_ij in the model is a transition matrix
         #######################################################################
 
-        self._b12 = 0.12 # Carbon cycle transition matrix
-        self._b23 = 0.0070 # Carbon cycle transition matrix
-        self._b11 = 1.0 - self._b12 # Carbon cycle transition matrix
+        self._b12 = 0.12  # Carbon cycle transition matrix
+        self._b23 = 0.0070  # Carbon cycle transition matrix
+        self._b11 = 1.0 - self._b12  # Carbon cycle transition matrix
         self._b21 = self._b12 * self._mateq / self._mueq  # Carbon cycle transition matrix
-        self._b22 = 1.0 - self._b21 - self._b23 # Carbon cycle transition matrix
+        self._b22 = 1.0 - self._b21 - self._b23  # Carbon cycle transition matrix
         self._b32 = self._b23 * self._mueq / self._mleq  # Carbon cycle transition matrix
-        self._b33 = 1.0 - self._b32 # Carbon cycle transition matrix
-        self._sig0 = self._e0/(self._q0*(1-self._miu0)) #From Eq. 14
+        self._b33 = 1.0 - self._b32  # Carbon cycle transition matrix
+        self._sig0 = self._e0/(self._q0*(1-self._miu0))  # From Eq. 14
 
         #######################################################################
         # Climate model parameters
         #######################################################################
 
-        self._t2xco2 = 3.1 # Equilibrium temp impact (oC per doubling CO2)
-        self._fex0 = 0.5 # 2015 forcings of non-CO2 GHG (Wm-2)
-        self._fex1 = 1.0 # 2100 forcings of non-CO2 GHG (Wm-2)
-        self._tocean0 = 0.0068 # Initial lower stratum temp change (C from 1900)
-        self._tatm0 = 0.85 #  Initial atmospheric temp change (C from 1900)
-        self._c1 = 0.1005 # Climate equation coefficient for upper level
-        self._c3 = 0.088 # Transfer coefficient upper to lower stratum
-        self._c4 = 0.025 # Transfer coefficient for lower level
-        self._fco22x = 3.6813 # eta in the model; Eq.22 : Forcings of equilibrium CO2 doubling (Wm-2)
+        self._t2xco2 = 3.10  # Equilibrium temp impact (oC per doubling CO2)
+        self._fex0 = 0.5  # 2015 forcings of non-CO2 GHG (Wm-2)
+        self._fex1 = 1.0  # 2100 forcings of non-CO2 GHG (Wm-2)
+        self._tocean0 = 0.0068  # Initial lower stratum temp change (C from 1900)
+        self._tatm0 = 0.85  # Initial atmospheric temp change (C from 1900)
+        self._c1 = 0.1005  # Climate equation coefficient for upper level
+        self._c3 = 0.088  # Transfer coefficient upper to lower stratum
+        self._c4 = 0.025  # Transfer coefficient for lower level
+        self._fco22x = 3.6813  # Forcings of equilibrium CO2 doubling (Wm-2)
 
         #######################################################################
         # Climate damage parameters
         #######################################################################
 
-        self._a10 = 0.0 # Initial damage intercept
-        self._a20 = 0.0 # Initial damage quadratic term
-        self._a1 = 0.0 # Damage intercept
-        self._a2 = 0.00236 # Damage quadratic term
-        self._a3 = 2.00 # Damage exponent
+        self._a10 = 0.0  # Initial damage intercept
+        self._a20 = 0.0  # Initial damage quadratic term
+        self._a1 = 0.0  # Damage intercept
+        self._a2 = 0.00236  # Damage quadratic term
+        self._a3 = 2.00  # Damage exponent
 
         #######################################################################
         # Abatement cost
         #######################################################################
 
-        self._expcost2 = 2.6 # Theta2, Eq. 10 Exponent of control cost function
-        self._pback = 550.0 # Cost of backstop 2010$ per tCO2 2015
-        self._gback = 0.025 # Initial cost decline backstop cost per period
-        self._limmiu = 1.20 # Upper limit on control rate after 2150
-        self._tnopol = 45 #  Period before which no emissions controls base
-        self._cprice0 = 2.0 # Initial base carbon price (2010$ per tCO2)
-        self._gcprice = 0.02 # Growth rate of base carbon price per year
+        self._expcost2 = 2.6  # Theta2, Eq. 10 Exponent of control cost function
+        self._pback = 550.0  # Cost of backstop 2010$ per tCO2 2015
+        self._gback = 0.025  # Initial cost decline backstop cost per period
+        self._limmiu = 1.20  # Upper limit on control rate after 2150
+        self._tnopol = 45  # Period before which no emissions controls base
+        self._cprice0 = 2.0  # Initial base carbon price (2010$ per tCO2)
+        self._gcprice = 0.02  # Growth rate of base carbon price per year
 
         #######################################################################
         # Scaling and inessential parameters
@@ -173,7 +173,7 @@ class DiceParams():
             self._etree[i] = self._eland0 * (1.0 - self._deland) ** (self._t[i]-1) 
             self._cumetree[i] = self._cumetree[i-1] + self._etree[i-1]*(5.0/3.666)
             self._rr[i] = 1.0 / ((1.0 + self._prstp)**(self._tstep * (self._t[i]-1))) 
-            self._cpricebase[i] = self._cprice0 * (1.0 + self._gcprice)**(5*(self._t[i]-1))
+            self._cpricebase[i] = self._cprice0 * (1.0 + self._gcprice)**(5.0*(self._t[i]-1))
 
         #The following three equations define the exogenous radiative forcing; 
         self._forcoth = np.zeros(self._num_times+1)
@@ -224,12 +224,12 @@ class DiceParams():
                 row.append(self._cumetree[i])
                 row.append(self._rr[i])
                 row.append(self._cpricebase[i])
-                   
+
                 writer.writerow(row)
 
             f.close()
 
-        elif 1==2:        
+        elif 1==2:
 
             print("Labour:", self._l) # CHECKED OK
             print("Growth rate of productivity", self._ga) # CHECKED OK
