@@ -149,7 +149,7 @@ if __name__ == '__main__':
     tol = 1e-14
     4517.31467991
 
-    for i in range(1, 101): # 102):
+    for i in range(1, 40): # 102):
 
         output_m = simulateDynamics(results.x, *args)
 
@@ -183,14 +183,12 @@ if __name__ == '__main__':
         dwde = (w_e - w_0) / e_bump
         dwdc = (w_c - w_0) / c_bump
 
- #       for j in range(0, len(w_c_x)):
- #           print(j, w_c_x[j], w_e_x[j], w_c_x[j] - w_e_x[j])
-        
         scc = -1000.0 * dwde / (0.000001 + dwdc)
         scc_vector.append(scc)
+
         print("Period:", i, "Year:", years[i-1], "DWDE", dwde, "DWDC", dwdc, "SCC:", scc) 
 
-    plt.plot(years, scc_vector);
+    plt.plot(years[1:], scc_vector);
     plt.xlabel("Year")
     plt.ylabel("SCC in $/tonne of Carbon")
     plt.title("Social Cost of Carbon")

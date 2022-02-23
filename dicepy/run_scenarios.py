@@ -28,7 +28,7 @@ if __name__ == '__main__':
     start_year = 2015
     final_year = start_year + p._tstep * num_times
     years = np.linspace(start_year, final_year, num_times, dtype=np.int32)
-
+    
     argsv = [-1.0, outputType, num_times,
              p._tstep,
              p._al, p._l, p._sigma, p._cumetree, p._forcoth,
@@ -40,7 +40,8 @@ if __name__ == '__main__':
              p._fco22x, p._t2xco2,
              p._rr, p._gama,
              p._tocean0, p._tatm0, p._elasmu, p._prstp, p._expcost2,
-             p._k0, p._dk, p._pbacktime]
+             p._k0, p._dk, p._pbacktime, 
+             0, 0.0, 0.0]
 
     args = tuple(argsv)
 
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     S_start = scenariosDF['Sav1'].values
     MIU_start = scenariosDF['Miu1'].values
 
-    # Arbitrary starting values for the control variables:
+#    Arbitrary starting values for the control variables:
 #    S_start = np.full(num_times,0.2596)
 #    MIU_start = np.full(num_times,  0.03)
     x_start = np.concatenate([MIU_start, S_start])
